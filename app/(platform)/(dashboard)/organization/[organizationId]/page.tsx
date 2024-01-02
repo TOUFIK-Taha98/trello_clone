@@ -1,8 +1,16 @@
+import { db } from "@/lib/db";
+
 const OrganizationIdPage = () => {
   async function create(formData: FormData) {
     "use server";
 
-    console.log("I'm triggered");
+    const title = formData.get("title") as string;
+
+    await db.board.create({
+      data: {
+        title,
+      },
+    });
   }
   return (
     <div>
