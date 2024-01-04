@@ -142,7 +142,10 @@ const ListContainer = ({ data, boardId }: ListContainerProps) => {
         });
 
         setOrderedData(newOrderedData);
-        // Todo: trigger server action
+        executeUpdateCardOrder({
+          boardId,
+          items: destList.cards,
+        });
       }
     }
   };
