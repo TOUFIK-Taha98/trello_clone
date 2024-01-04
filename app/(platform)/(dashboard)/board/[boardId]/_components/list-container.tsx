@@ -10,6 +10,15 @@ interface ListContainerProps {
   data: ListWithCards[];
   boardId: string;
 }
+
+function reorder<T>(list: T[], startIndex: number, endIndex: number) {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+}
+
 const ListContainer = ({ data, boardId }: ListContainerProps) => {
   const [orderedData, setOrderedData] = useState(data);
 
@@ -17,8 +26,34 @@ const ListContainer = ({ data, boardId }: ListContainerProps) => {
     setOrderedData(data);
   }, [data]);
 
+  const onDrangEnd = (result: any) => {
+    const { destination, source, type } = result;
+    if (!destination) return;
+
+    // if dropped in the same position we don't have to do anything
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    // User moves a list
+    if (type === "list") {
+      const items = reorder(orderedData, source.index, destination.index).map(
+        (item, index) => ({
+          ...item,
+          order: index,
+        })
+      );
+
+      setOrderedData(items);
+      // todo : trigger server action
+    }
+  };
+
   return (
-    <DragDropContext onDragEnd={() => {}}>
+    <DragDropContext onDragEnd={onDrangEnd}>
       <Droppable droppableId="lists" type="list" direction="horizontal">
         {(provided) => (
           <ol
